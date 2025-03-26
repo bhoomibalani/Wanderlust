@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const Listing = require("../major project/models/listing.js");
+const Review = require("../major project/models/review.js");
 const path = require("path");
 const methodOverride = require("method-override");
 const data = require("./init/data");
@@ -99,6 +100,21 @@ app.delete("/listings/:id", wrapAsync(async (req, res) => {
     res.redirect("/listings");
 }));
 
+//reviews
+app.post("/listings/:id/reviews",async(req,res)=>{
+    const listing = await Listing.findById(req.params.id);
+    const newReview = new Review(req.body.review);
+    listing.reviews.push(newReview);  // Add the new review's ObjectId to the reviews array
+    await newReview.save();
+    await listing.save() ; // Save the updated listing
+    console.log("new review saved");
+   
+    // Step 3: Redirect to the listing's page (the specific listing using the ID)
+    res.redirect(`/listings/${req.params.id}`);
+
+})
+
+
 // app.get("/testListing",async(req,res)=>{
 //     let sampleListing= new Listing({
 //         title:"my new villa",
@@ -122,6 +138,7 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render("error.ejs", { message });
 
 })
+
 
 
 app.listen(8080, () => {
