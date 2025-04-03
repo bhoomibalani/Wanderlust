@@ -5,11 +5,13 @@ const path = require("path");
 const methodOverride = require("method-override");
 const data = require("./init/data");
 const ejsMate = require("ejs-mate");
-
+const session = require("express-session");
 const ExpressError = require("./utils/ExpressError.js");
+const flash = require("connect-flash");
 
-const listings=require("./routes/listing.js");
-const reviews=require("./routes/review.js");
+
+const listings = require("./routes/listing.js");
+const reviews = require("./routes/review.js");
 //database
 const MONGO_URL = 'mongodb://127.0.0.1:27017/wanderlust';
 
@@ -30,22 +32,42 @@ app.use(methodOverride("_method"));
 app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
+const sessionOptions = {
+    secret: "mysupersecretcode",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+    },
+};
+
 app.get("/", (req, res) => {
     res.send("hi,im root");
 });
 
-const validateReview=(req,res,next)=>{
-    let {error}=reviewSchema.validate(req.body);
-   
-    if(error){
-        let errMsg=error.details.map((el)=>el.message).join(",");
-        throw new ExpressError(400,errMsg);
-    }else{
-        next();
-    }};
+app.use(session(sessionOptions));
+app.use(flash());
 
-app.use("/listings",listings);
-app.use("/listings/:id/reviews",reviews);
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+})
+const validateReview = (req, res, next) => {
+    let { error } = reviewSchema.validate(req.body);
+
+    if (error) {
+        let errMsg = error.details.map((el) => el.message).join(",");
+        throw new ExpressError(400, errMsg);
+    } else {
+        next();
+    }
+};
+
+app.use("/listings", listings);
+app.use("/listings/:id/reviews", reviews);
 
 app.all("*", (req, res, next) => {
     next(new ExpressError(404, "Page Not Found!"));
