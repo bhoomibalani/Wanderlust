@@ -1,3 +1,9 @@
+if (process.env.NODE_ENV != "production") { 
+    require('dotenv').config();
+}
+
+
+
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -8,13 +14,13 @@ const ejsMate = require("ejs-mate");
 const session = require("express-session");
 const ExpressError = require("./utils/ExpressError.js");
 const flash = require("connect-flash");
-const passport=require("passport");
-const LocalStrategy=require("passport-local");
-const User=require("./models/user.js");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user.js");
 
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
-const userRouter=require("./routes/user.js");
+const userRouter = require("./routes/user.js");
 //database
 const MONGO_URL = 'mongodb://127.0.0.1:27017/wanderlust';
 
@@ -63,7 +69,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
-    res.locals.currUser=req.user; 
+    res.locals.currUser = req.user;
     console.log(req.user);
     next();
 });
@@ -91,7 +97,7 @@ const validateReview = (req, res, next) => {
 
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
-app.use("/",userRouter);
+app.use("/", userRouter);
 
 app.all("*", (req, res, next) => {
     next(new ExpressError(404, "Page Not Found!"));
