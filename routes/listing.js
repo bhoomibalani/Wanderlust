@@ -23,8 +23,6 @@ const upload = multer({ storage});
     wrapAsync(listingController.createListing));
  
 
-
-
 //new route
 router.get("/new",isLoggedIn, listingController.renderNewForm);
 

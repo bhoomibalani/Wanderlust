@@ -13,8 +13,8 @@ const listingSchema = new Schema({
         required: true,
     },
     image: {
-        url:String,
-        filename:String,
+        url: String,
+        filename: String,
     },
     price: Number,
     location: {
@@ -31,21 +31,34 @@ const listingSchema = new Schema({
             ref: "Review",
         }
     ],
-    owner:{
-        type:Schema.Types.ObjectId,
-        ref:"User",
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
     },
 
-    geometry:{
-        type:{
-            type:String,
-            enum:['Point'],
-            required:true
+    geometry: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            required: true
         },
-        coordinates:{
-            type:[Number],
-            required:true
+        coordinates: {
+            type: [Number],
+            required: true
         }
+    },
+    category: {
+        type: String,
+        enum: ['Rooms',
+            'Iconic Cities',
+            'Mountains',
+            'Amazing Pools',
+            'Camping',
+            'Farms',
+            'Arctic',
+            'Domes',
+            'Boats',
+            'Others'],
     }
 });
 
