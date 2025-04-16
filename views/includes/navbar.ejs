@@ -49,10 +49,14 @@
         <form class="d-flex" role="search">
           <input class="form-control me-2 search-input"
            type="search" 
+           name="query"
            placeholder="Search destinations" >
            <div class="search-logo">
-          <button class="btn search-btn" type="submit">
-            <i class="fa-solid fa-magnifying-glass"></i>Search</button>
+            <form class="d-flex mb-4"  action="/listings" method="GET">
+              <button class="btn search-btn" type="submit" >
+                <i class="fa-solid fa-magnifying-glass"></i>Search</button>
+            </form>
+     
           </div>
         </form>
       </div>
