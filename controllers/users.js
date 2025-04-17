@@ -1,12 +1,18 @@
+const User = require("../models/user.js"); 
+
+
+
 module.exports.signup=async (req, res) => {
     try {
         let { username, email, password } = req.body;
         const newUser = new User({ email, username });
+       
         const registeredUser = await User.register(newUser, password)
-      
+        
         req.login(registeredUser, (err) => {
             if (err) {
                 return next(req.session.redirectUrl);
+                
             }
             req.flash("success", "Welcome to Wanderlust!");
             res.redirect("/listings");
@@ -14,6 +20,7 @@ module.exports.signup=async (req, res) => {
     } catch (e) {
         req.flash("error", e.message);
         res.redirect("/signup");
+        console.log("eooor");
     }
 }
 
