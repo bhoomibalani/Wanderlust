@@ -4,6 +4,11 @@ const Review = require("./models/review");
 const { listingSchema,reviewSchema } = require("./schema.js");
 const ExpressError = require("./utils/ExpressError.js");
 
+
+const express = require('express');
+const app = express();
+
+
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
         //redirectURL

@@ -32,14 +32,12 @@ main().then(() => {
 
 async function main() {
     await mongoose.connect(dbUrl);
+    console.log("🔗 Connected to DB:", mongoose.connection.name);
+    console.log("DB URL on Render:", process.env.ATLASDB_URL);
+
 }
 
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride("_method"));
-app.engine('ejs', ejsMate);
-app.use(express.static(path.join(__dirname, "/public")));
+
 
 const store=MongoStore.create({
     mongoUrl:dbUrl,
@@ -53,11 +51,14 @@ store.on("error",()=>{
     console.log("Error in Mongo session store",err);
 });
 
+///
+
+
 const sessionOptions = {
     store,
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -66,26 +67,37 @@ const sessionOptions = {
 };
 
 
+app.engine('ejs', ejsMate);
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.set('trust proxy', 1); // trust first proxy
 
+app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
 
+app.use(express.static(path.join(__dirname, "/public")));
 
 app.use(session(sessionOptions));
 app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
 
+
+passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
 
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
-    res.locals.currUser = req.user;
+    res.locals.currUser = req.user || null;
     console.log(req.user);
     next();
 });
+
+
 
 // app.get("/demouser",async(req,res)=>{
 //     let fakeUser=new User({
